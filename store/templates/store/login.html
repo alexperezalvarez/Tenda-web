@@ -1,0 +1,78 @@
+{% extends 'store/main.html' %} 
+{% load widget_tweaks %} 
+{% load static %} 
+{% block head %}
+<link
+  rel="stylesheet"
+  href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+  integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP"
+  crossorigin="anonymous"
+/>
+<link rel="stylesheet" href="{% static 'store/css/login.css' %}" />
+{% endblock head %} 
+{% block content %}
+<div class="d-flex justify-content-center h-100">
+  <div class="user_card">
+    <div class="d-flex justify-content-center">
+      <h3 id="form-title">Iniciar sesión</h3>
+    </div>
+    <div class="d-flex justify-content-center form_container">
+      <form method="POST" action="">
+        {% csrf_token %} 
+        <input type="hidden" name="next" value="{{next}}">
+        {% for field in form %}
+        <div class="input-group mb-3">
+          <div class="input-group-append">
+            {% if field.name == 'username' %}
+            <span class="input-group-text"><i class="fas fa-user"></i></span>
+            {% else %} {% if field.name == 'password' %}
+            <span class="input-group-text"><i class="fas fa-key"></i></span>
+            {% endif %} {% endif %}
+          </div>
+          {% if field.name == 'username' %}
+          {{field|add_class:'form-control'|attr:'placeholder:Usuario'}} 
+          {% else %}
+          {{field|add_class:'form-control'|attr:'placeholder:Contraseña'|attr:'id:id_password1'}}
+          {% endif %}
+        </div>
+        {% endfor %}
+        <div class="form-check form-switch ms-1">
+          <label class="form-check-label">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value=""
+              id="showPassword"
+            />
+            Ver contraseña
+          </label>
+        </div>
+        <div class="d-flex justify-content-center mt-3 login_container">
+          <input class="btn login_btn" type="submit" value="Iniciar sesión" />
+        </div>
+      </form>
+    </div>
+    <div class="mt-4">
+      <div class="d-flex justify-content-center links">
+        ¿No tienes una cuenta?
+        <a href="{% url 'register' %}" class="ml-2">Registrar</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+{% block js %}
+<script>
+  //mostrar y ocultar contraseña
+  const passwordInput = document.getElementById("id_password1");
+  const showPasswordCheckbox = document.getElementById("showPassword");
+  
+  showPasswordCheckbox.addEventListener("change", function() {
+    if (showPasswordCheckbox.checked) {
+      passwordInput.type = "text";
+    } else {
+      passwordInput.type = "password";
+    }
+  });
+</script>
+{% endblock js %}

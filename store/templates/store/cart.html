@@ -1,0 +1,151 @@
+{% extends 'store/main.html' %} 
+{% load static %} 
+{% load humanize %} 
+{% block content %}
+<div id="contenedor_todo">
+  {% if object_list %}
+  <div class="container shadow p-2">
+    <h1>Checkout</h1>
+    <h2>
+      Total <span class="text-success">$</span>
+      <span id="checkout_total">{{checkoutValor|intcomma}}</span>
+    </h2>
+  </div>
+  <div class="shadow mt-4">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col">Producto</th>
+          <th scope="col">Precio</th>
+          <th scope="col">Cantidad</th>
+          <th scope="col">Total</th>
+          <th scope="col">Opciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in object_list %}
+        <tr id="item-{{p.id}}" class="">
+          <td>
+            <a href="{% url 'detalle_product' p.product.id %}">
+              <img class="row-image" src="{{p.product.photo.url}}" />
+            </a>
+          </td>
+          <td><span>{{p.product.name|title}}</span></td>
+          <td>
+            <span>
+              <span class="text-success">$</span>
+              <span id="can-uni">{{p.product.price|intcomma}}</span>
+            </span>
+          </td>
+          <td>
+            <div class="cantidad">
+              <button id="{{p.id}}/aumentar" class="btnAccion btnCan" style="">
+                <i class="bi bi-plus-square"></i>
+              </button>
+              <span id="product/{{p.id}}">{{p.cantidad}}</span>
+              <button id="{{p.id}}/disminuir" class="btnAccion btnCan">
+                <i class="bi bi-dash-square"></i>
+              </button>
+            </div>
+          </td>
+          <td>
+            <span class="text-success">$</span>
+            <span id="total_product/{{p.id}}">{{p.total|intcomma}}</span>
+          </td>
+          <td>
+            <button class="btn btn-danger btnAccion" id="{{p.id}}/eliminar" href="#"
+              >Eliminar</button
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <h2>No hay productos en el carrito</h2>
+  {% endif %}
+</div>
+{% endblock content %} {% block js %}
+<script>
+  // js puro con chtgpt
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Obtener todos los elementos con la clase "btnAccion"
+    let botones = document.querySelectorAll(".btnAccion");
+    botones.forEach(function (boton) {
+      // Agregar un evento de clic a cada botón
+      boton.addEventListener("click", function (e) {
+        e.preventDefault(); // Detener la acción por defecto del botón
+
+        // Obtener el ID del botón y dividirlo entre la acción y el ID del elemento
+        let id = this.getAttribute("id").split("/");
+        let id_item = id[0];
+        let action = id[1];
+        let opcion = true; //por si se va por disminuir una cantidad de 1
+        if (action == "disminuir") {
+          //obtener cantidad
+          let cantidad = document.getElementById(`product/${id_item}`);
+          cantidad = parseInt(cantidad.innerText); //obtengo el contenido de la etiqueta
+          if (cantidad == 1) {
+            opcion = false; //cancelo la ejecucion de la petición para realizarla con el sweetalert
+            //alerta de sweetalert
+            const swalWithBootstrapButtons = Swal.mixin({
+              customClass: {
+                confirmButton: "btn btn-success me-2", //clases de los botones
+                cancelButton: "btn btn-danger ms-2",
+              },
+              buttonsStyling: false,
+            });
+
+            swalWithBootstrapButtons
+              .fire({
+                title: "La cantidad es 1, ¿Desea eliminar el producto?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "No",
+                reverseButtons: false, //si quiero invertirlos
+              })
+              .then((result) => {
+                if (result.isConfirmed) {
+                  action = "eliminar"; //pongo la accion como eliminar si el usuario dice si, y ejecuto la función
+                  //creo span de cargando
+                  const etiqueta = document.createElement('span');
+                  etiqueta.classList.add('spinner-border'); // agregamos la clase a la etiqueta
+                  etiqueta.classList.add('spinner-border-sm'); // spinner pequeño
+                  etiqueta.classList.add('me-1'); // margin end o rigth
+                  // insertamos la etiqueta antes del botón eliminar
+                  boton=document.getElementById(`${id_item}/eliminar`)//obtenemos el botón eliminar
+                  boton.setAttribute('disabled','') //lo desactivo
+                  boton.insertAdjacentHTML('afterbegin', etiqueta.outerHTML);
+                  carritoAcciones(
+                    id_item,
+                    '{% url "acciones_carrito" %}',
+                    action
+                  );
+                }
+              });
+          }
+        }
+        // Llamar a la función "carritoAcciones" con los argumentos necesarios y si la opción esta en true
+        if (opcion == true) {
+          if (action=='eliminar') {
+          //creo span de cargando
+          const etiqueta = document.createElement('span');
+          etiqueta.classList.add('spinner-border'); // agregamos la clase a la etiqueta
+          etiqueta.classList.add('spinner-border-sm'); // spinner pequeño
+          etiqueta.classList.add('me-1'); // margin end o rigth
+          // insertamos la etiqueta antes del botón
+          boton.insertAdjacentHTML('afterbegin', etiqueta.outerHTML);}
+          boton.setAttribute('disabled', ''); //desactivamos el boton, pero tiene que ser un boton y no un link (<a>)
+            
+          carritoAcciones(id_item, '{% url "acciones_carrito" %}', action);
+        }
+      });
+    });
+  });
+</script>
+{% endblock js %}

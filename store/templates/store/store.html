@@ -1,0 +1,87 @@
+{% extends 'store/main.html' %} 
+{% load static %} 
+{% load humanize %}
+{% block content %} 
+{% if user.is_authenticated %}
+<h1>Bienvenido {{user.username|title}}</h1>
+{% endif %}
+<div class="row">
+  {% for product in object_list %}
+  <div class="col-lg-4">
+    <img class="thumbnail img-fluid" src="{{product.photo.url}}" />
+    <div class="box-element product">
+      <h4 {% if product.digital %} class="text-success" {% endif %}>
+        <strong>{{product.name|title}}</strong>
+      </h4>
+      <hr />
+      {% if user.is_authenticated %}
+        <button id="{{product.id}}/add_cart" href="#" class="btn btn-outline-secondary btnAccion">Agregar Carrito</button>
+      {% endif %}
+      
+      <a class="btn btn-outline-success" href="{% url 'detalle_product' product.id %}">Ver</a>
+      <h5 style="display: inline-block; float: right">
+        <strong>${{product.price|intcomma}}</strong>
+      </h5>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock content %} 
+
+{% block js %}
+<script>
+{% if not object_list %}
+  Swal.fire({
+  title: 'No se encontró el producto',
+  icon: 'question'
+}).then((result) => { //con then recibo el resultado de lo que ponga el usuario, en este caso solo confirma pq solo esta ese boton
+  window.location.href = "{% url 'store' %}";
+  
+});
+{% else %}
+/*$(document).ready(function () {
+  //obtengo todos los links con esa clase
+  $('.btnAccion').on("click", function (e) {
+    //obtengo el boton o boton de link y le agrego el evento
+      e.preventDefault(); //detengo el evento de irse a la url
+      
+      var id=$(this).attr("id").split("/");//obtengo el id del boton y lo parto entre la accion y el id del item
+      var id_item = id[0] //cojo el id del item que esta de primero
+      var action=id[1]  //cojo la accion que esta de segunda
+      // console.log(action)
+      //se ejecuta cuando se entra a la pagina
+      carritoAcciones(
+        id_item, //le paso el id del item
+        '{% url 'store' %}', //url a donde va la petición
+        action //accion
+        )
+  })
+  })*/
+  // js puro con chatgpt
+  document.addEventListener('DOMContentLoaded', function() {
+  // Obtener todos los elementos con la clase "btnAccion"
+  var botones = document.querySelectorAll('.btnAccion');
+
+  botones.forEach(function(boton) {
+    // Agregar un evento de clic a cada botón
+    boton.addEventListener('click', function(e) {
+      e.preventDefault(); // Detener la acción por defecto del botón
+
+      // Obtener el token CSRF del input escondido de la página
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      // Obtener el ID del botón y dividirlo entre la acción y el ID del elemento
+      var id = this.getAttribute('id').split('/');
+      var id_item = id[0];
+      var action = id[1];
+
+      // Llamar a la función "carritoAcciones" con los argumentos apropiados
+      carritoAcciones(id_item, '{% url "store" %}', action, '{{user.id}}', csrftoken);
+    });
+  });
+});
+
+  {% endif %}
+  </script>
+
+{% endblock js %}
