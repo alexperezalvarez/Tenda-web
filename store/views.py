@@ -241,3 +241,6 @@ class CarritoAcciones(View):
 def checkout(request):
     context = {}
     return render(request, 'store/checkout.html', context)
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('logout.html')

@@ -10,7 +10,7 @@ urlpatterns = [
     path('register/', RegisterForm.as_view(), name="register"),
     path('login/', IngresarView.as_view(), name="login"),
     #cerrar sesión
-    path('cerrar/', LogoutView.as_view(), name="cerrar"),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('product/<int:pk>/',ProductDetailView.as_view(),name='detalle_product'),
     #acciones del carrito
     path('cart/acciones/',CarritoAcciones.as_view(), name="acciones_carrito")

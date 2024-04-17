@@ -1,7 +1,7 @@
 {% load static %}
 <nav class="navbar navbar-expand-lg bg-dark sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand text-white" href="{% url 'store' %}">Ecom</a>
+    <a class="navbar-brand text-white" href="{% url 'store' %}" >Ecom</a>
     <button
       class="navbar-toggler"
       type="button"
@@ -28,9 +28,7 @@
         </form>
         {% endif %} {% if user.is_authenticated %}
         <li class="nav-item">
-          <a href="{% url 'cerrar' %}" class="btn btn-danger text-white"
-            >Cerrar</a
-          >
+          <a href="{% url 'logout' %}" class="btn btn-danger text-white">Cerrar sesión</a>
         </li>
         {% else %}
         <li class="nav-item">

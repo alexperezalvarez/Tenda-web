@@ -1,0 +1,12 @@
+{% extends 'store/main.html' %} 
+{% load widget_tweaks %} 
+{% load static %} 
+{% block head %}
+
+{% endblock head %} 
+{% block content %}
+<!-- Formulario de cierre de sesión -->
+<form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Cerrar sesión</button>
+</form>
